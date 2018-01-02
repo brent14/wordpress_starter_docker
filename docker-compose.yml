@@ -1,0 +1,48 @@
+
+version: '2'
+services:
+  db:
+    container_name: PROJECT_NAME_mysql
+    image: mysql:5.7
+    volumes:
+      # PRODUCTION DATABASE
+      # - "./.data/db/prod:/var/lib/mysql"
+      # DEVELOPMENT DATABASE
+      - "./.data/db/dev:/var/lib/mysql"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    ports:
+      - 3306:3306
+
+  wordpress:
+    container_name: PROJECT_NAME_wp
+    depends_on:
+      - db
+    image: wordpress:latest
+    links:
+      - db
+    ports:
+      - 80:80
+    restart: always
+    environment:
+      # PRODUCTION DATABASE
+      # VIRTUAL_HOST: PROJECT_URL_PROD
+      # DEVELOPMENT DATABASE
+      VIRTUAL_HOST: PROJECT_URL_DEV
+      # Prod
+      # WORDPRESS_DB_HOST: AWS URL TO DB
+      # Dev
+      WORDPRESS_DB_HOST: db:3306
+      # Prod
+      # WORDPRESS_DB_PASSWORD: AWS PASSWORD TO DB
+      # Dev
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DEBUG: 1
+      
+    volumes:
+      - ./wp-content:/var/www/html/wp-content/
+
